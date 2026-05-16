@@ -1496,6 +1496,10 @@ class MyClass {
             if (this.rivetsData.currJoy == 10) this.rivetsData.remappings.Joy_Mapping_Action_Z = joyLast;
             if (this.rivetsData.currJoy == 11) this.rivetsData.remappings.Joy_Mapping_Action_L = joyLast;
             if (this.rivetsData.currJoy == 12) this.rivetsData.remappings.Joy_Mapping_Action_R = joyLast;
+            if (this.rivetsData.currJoy == 13) this.rivetsData.remappings.Joy_Mapping_Action_CUP = joyLast;
+            if (this.rivetsData.currJoy == 14) this.rivetsData.remappings.Joy_Mapping_Action_CDOWN = joyLast;
+            if (this.rivetsData.currJoy == 15) this.rivetsData.remappings.Joy_Mapping_Action_CLEFT = joyLast;
+            if (this.rivetsData.currJoy == 16) this.rivetsData.remappings.Joy_Mapping_Action_CRIGHT = joyLast;
         }
         this.rivetsData.remapWait = false;
     }

@@ -355,17 +355,17 @@ class InputController {
             Joy_Mapping_Right: 15,
             Joy_Mapping_Down: 13,
             Joy_Mapping_Up: 12,
-            Joy_Mapping_Action_A: 0,
-            Joy_Mapping_Action_B: 2,
+            Joy_Mapping_Action_A: 6,
+            Joy_Mapping_Action_B: 8,
             Joy_Mapping_Action_Start: 9,
-            Joy_Mapping_Action_Z: 4,
-            Joy_Mapping_Action_L: 6,
+            Joy_Mapping_Action_Z: 7,
+            Joy_Mapping_Action_L: 4,
             Joy_Mapping_Action_R: 5,
             Joy_Mapping_Menu: 11,
-            Joy_Mapping_Action_CLEFT: -1,
-            Joy_Mapping_Action_CRIGHT: -1,
-            Joy_Mapping_Action_CUP: -1,
-            Joy_Mapping_Action_CDOWN: -1,
+            Joy_Mapping_Action_CLEFT: 3,
+            Joy_Mapping_Action_CRIGHT: 1,
+            Joy_Mapping_Action_CUP: 0,
+            Joy_Mapping_Action_CDOWN: 2,
         };
     }
 
@@ -449,6 +449,32 @@ class InputController {
                         else {
                             if (this.Key_Up) {
                                 this.sendKeyUpEvent(this.KeyMappings.Mapping_Up);
+                            }
+                        }
+                        // C-buttons on axes 2/3 (common for N64 USB adapters)
+                        if (gp.axes.length > 2) {
+                            let c_horiz = gp.axes[2];
+                            let c_vert = gp.axes.length > 3 ? gp.axes[3] : 0;
+
+                            if (c_horiz < -.3) {
+                                this.Key_Action_CLEFT = true;
+                            } else {
+                                this.Key_Action_CLEFT = false;
+                            }
+                            if (c_horiz > .3) {
+                                this.Key_Action_CRIGHT = true;
+                            } else {
+                                this.Key_Action_CRIGHT = false;
+                            }
+                            if (c_vert < -.3) {
+                                this.Key_Action_CUP = true;
+                            } else {
+                                this.Key_Action_CUP = false;
+                            }
+                            if (c_vert > .3) {
+                                this.Key_Action_CDOWN = true;
+                            } else {
+                                this.Key_Action_CDOWN = false;
                             }
                         }
                     }
