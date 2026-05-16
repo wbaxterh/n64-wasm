@@ -196,14 +196,19 @@ MYFLAGS   := \
 	-DM64P_CORE_PROTOTYPES \
 	-D_ENDUSER_RELEASE \
 	-DSINC_LOWER_QUALITY \
-	-DNOSSE \
-	-DNO_ASM \
+	-DARCH_MIN_SSE2 \
 	-DNO_LIBCO \
 	-DDISABLE_3POINT \
 	-Wno-c++11-narrowing \
+	-Wno-incompatible-pointer-types \
+	-Wno-int-conversion \
+	-Wno-implicit-function-declaration \
 	-DINLINE="inline" \
 	-O3 \
     -flto \
+	-msimd128 \
+	-mrelaxed-simd \
+	-msse -msse2 \
 	-s USE_SDL=2 -s USE_SDL_TTF=2 \
     -s USE_ZLIB=1 \
 	-s USE_SDL_IMAGE=2
@@ -221,8 +226,11 @@ n64wasm.js: $(FILES)
 	-s FULL_ES3=1 \
 	-s ASSERTIONS=0 \
 	-O3 \
+	-flto \
+	-msimd128 \
+	-mrelaxed-simd \
 	-s EXIT_RUNTIME=0 \
-	-s EXTRA_EXPORTED_RUNTIME_METHODS="['callMain','cwrap']" \
+	-s EXPORTED_RUNTIME_METHODS="['callMain','cwrap']" \
     -s EXPORTED_FUNCTIONS="['_main','_runMainLoop','_neilGetSoundBufferResampledAddress', \
     '_neilGetAudioWritePosition','_neil_serialize','_neil_unserialize','_neil_toast_message', \
     '_neil_export_eep','_neil_export_sra','_neil_export_fla','_neil_reset','_toggleFPS', '_neil_send_mobile_controls', \
