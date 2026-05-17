@@ -209,6 +209,7 @@ MYFLAGS   := \
 	-msimd128 \
 	-mrelaxed-simd \
 	-msse -msse2 \
+	-pthread \
 	-s USE_SDL=2 -s USE_SDL_TTF=2 \
     -s USE_ZLIB=1 \
 	-s USE_SDL_IMAGE=2
@@ -221,6 +222,7 @@ n64wasm.js: $(FILES)
 	-s USE_SDL_IMAGE=2 \
     -lGL \
     -s TOTAL_MEMORY=536870912 \
+	-s ALLOW_MEMORY_GROWTH=0 \
 	--use-preload-plugins \
 	-s MIN_WEBGL_VERSION=2 \
 	-s FULL_ES3=1 \
@@ -229,6 +231,8 @@ n64wasm.js: $(FILES)
 	-flto \
 	-msimd128 \
 	-mrelaxed-simd \
+	-pthread \
+	-s PTHREAD_POOL_SIZE=2 \
 	-s EXIT_RUNTIME=0 \
 	-s EXPORTED_RUNTIME_METHODS="['callMain','cwrap']" \
     -s EXPORTED_FUNCTIONS="['_main','_runMainLoop','_neilGetSoundBufferResampledAddress', \
@@ -237,7 +241,8 @@ n64wasm.js: $(FILES)
     '_neil_set_buffer_remaining','_neil_set_endframe_callback','_neil_set_double_speed']" \
 	-s INVOKE_RUN=0 \
     && mv n64wasm.js ../dist/ \
-    && mv n64wasm.wasm ../dist/
+    && mv n64wasm.wasm ../dist/ \
+    && mv n64wasm.worker.js ../dist/ 2>/dev/null; true
     
 
 %.o : %.cpp

@@ -6,15 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="keywords" content="N64 Emulator, N64 JavaScript Emulator, WebAssembly, HTML5, Nintendo 64, THPS, TrickBook">
     <meta charset="UTF-8">
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/rivets/0.9.6/rivets.bundled.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.0/nipplejs.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rivets/0.9.6/rivets.bundled.min.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.0/nipplejs.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="n64wasm.css">
     <script>
         // This check needs to be at the top in order to avoid the flash when the theme is swapped.
@@ -95,6 +95,41 @@
     <div class="n64-header">
         <div class="n64-title">N64.wasm</div>
         <div class="n64-subtitle">SIMD-Powered Browser Emulator</div>
+        <button id="kbBtn" class="n64-kb-btn" onclick="document.getElementById('kbOverlay').style.display='flex'">Keyboard Controls</button>
+    </div>
+
+    <!-- Keyboard Controls Overlay -->
+    <div id="kbOverlay" class="n64-kb-overlay" style="display:none;" onclick="this.style.display='none'">
+        <div class="n64-kb-panel" onclick="event.stopPropagation()">
+            <div class="n64-kb-title">Keyboard Controls</div>
+            <div class="n64-kb-grid">
+                <div class="n64-kb-section">
+                    <div class="n64-kb-section-title">Movement</div>
+                    <div class="n64-kb-row"><kbd>Arrow Keys</kbd><span>Analog Stick</span></div>
+                    <div class="n64-kb-row"><kbd>Y</kbd> <kbd>H</kbd> <kbd>B</kbd> <kbd>N</kbd><span>D-Pad</span></div>
+                </div>
+                <div class="n64-kb-section">
+                    <div class="n64-kb-section-title">Buttons</div>
+                    <div class="n64-kb-row"><kbd>D</kbd><span>A Button</span></div>
+                    <div class="n64-kb-row"><kbd>S</kbd><span>B Button</span></div>
+                    <div class="n64-kb-row"><kbd>A</kbd><span>Z Trigger</span></div>
+                    <div class="n64-kb-row"><kbd>Enter</kbd><span>Start</span></div>
+                </div>
+                <div class="n64-kb-section">
+                    <div class="n64-kb-section-title">Shoulders</div>
+                    <div class="n64-kb-row"><kbd>Q</kbd><span>L Shoulder</span></div>
+                    <div class="n64-kb-row"><kbd>E</kbd><span>R Shoulder</span></div>
+                </div>
+                <div class="n64-kb-section">
+                    <div class="n64-kb-section-title">C-Buttons</div>
+                    <div class="n64-kb-row"><kbd>I</kbd><span>C-Up</span></div>
+                    <div class="n64-kb-row"><kbd>K</kbd><span>C-Down</span></div>
+                    <div class="n64-kb-row"><kbd>J</kbd><span>C-Left</span></div>
+                    <div class="n64-kb-row"><kbd>L</kbd><span>C-Right</span></div>
+                </div>
+            </div>
+            <div class="n64-kb-hint">Click anywhere outside to close</div>
+        </div>
     </div>
 
     <!-- Gamepad Wizard (injected by JS) -->
