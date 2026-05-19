@@ -135,6 +135,9 @@
     <!-- Gamepad Wizard (injected by JS) -->
     <div id="gamepadWizard"></div>
 
+    <!-- Game Library -->
+    <div id="gameLibraryContainer"></div>
+
     <div id="maindiv" class="container text-center">
         <h1>
             N64 Wasm
@@ -1091,6 +1094,8 @@
         </div>
     </div>
 
+    <script src="rom-parser.js"></script>
+    <script src="game-library.js"></script>
     <script src="gamepad-wizard.js"></script>
     <script src="settings.js?v=1"></script>
     <script src="romlist.js"></script>
@@ -1099,6 +1104,16 @@
         var script = document.createElement('script');
         script.src = 'script.js?v=' + rando;
         document.getElementsByTagName('head')[0].appendChild(script);
+
+        // Initialize game library after main app loads
+        setTimeout(function() {
+            if (window.gameLibrary && window.myApp) {
+                gameLibrary.init('gameLibraryContainer', function(file) {
+                    // Feed selected game into the emulator's existing ROM loader
+                    myApp.loadFile(file);
+                });
+            }
+        }, 2000);
     </script>
 </body>
 
