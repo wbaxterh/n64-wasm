@@ -64,12 +64,10 @@ class GameLibrary {
   }
 
   /**
-   * Get a cover art URL for a game (placeholder system)
-   * In the future this queries IGDB. For now, generates a stylized placeholder.
+   * Get a cover art URL for a game from the database
    */
   getCoverUrl(meta) {
-    // No real cover art API yet — return null, UI will show a styled placeholder
-    return null;
+    return meta?.cover || null;
   }
 
   /**
@@ -95,11 +93,13 @@ class GameLibrary {
       return;
     }
 
+    const driveBtn = window.driveUI ? window.driveUI.renderConnectButton() : '';
     this.container.innerHTML = `
       <div class="n64-library">
         <div class="n64-library__header">
           <div class="n64-library__title">Game Library</div>
           <div class="n64-library__actions">
+            ${driveBtn}
             <button class="n64-btn" onclick="gameLibrary.showAddDialog()">+ Add ROMs</button>
           </div>
         </div>
@@ -165,9 +165,16 @@ class GameLibrary {
         <div class="n64-library-empty__text">
           Drop ROM files here or click to add games to your library
         </div>
-        <button class="n64-btn n64-btn--filled" onclick="document.getElementById('libraryFileInput').click()">
-          Add ROMs
-        </button>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+          <button class="n64-btn n64-btn--filled" onclick="document.getElementById('libraryFileInput').click()">
+            Add ROMs
+          </button>
+          ${window.driveUI?.drive?.configured ? `
+            <button class="n64-btn n64-btn--yellow" onclick="driveUI.connect()">
+              Connect Google Drive
+            </button>
+          ` : ''}
+        </div>
         <input type="file" id="libraryFileInput" multiple accept=".z64,.n64,.v64,.rom" style="display:none"
           onchange="gameLibrary.handleFileInput(event)">
       </div>
@@ -204,16 +211,67 @@ class GameLibrary {
   /**
    * User selected a game — load it into the emulator
    */
-  selectGame(crcKey) {
+  async selectGame(crcKey) {
     const game = this.games.find(g => g.header.crcKey === crcKey);
-    if (!game || !game.file) return;
+    if (!game) return;
 
     game.lastPlayed = Date.now();
     this.saveToCache();
 
-    if (this.onGameSelect) {
-      this.onGameSelect(game.file);
+    // If we have a local File reference, use it directly
+    if (game.file) {
+      if (this.onGameSelect) this.onGameSelect(game.file);
+      return;
     }
+
+    // If it's a Drive file, stream it
+    if (game.driveFileId && window.googleDrive?.accessToken) {
+      try {
+        this.showLoadingOverlay(game.meta?.name || game.fileName);
+        const buffer = await window.googleDrive.downloadFile(game.driveFileId);
+        this.hideLoadingOverlay();
+
+        // Create a File-like object from the ArrayBuffer
+        const blob = new Blob([buffer]);
+        const file = new File([blob], game.fileName);
+
+        if (this.onGameSelect) this.onGameSelect(file);
+      } catch (e) {
+        this.hideLoadingOverlay();
+        console.error('Failed to download ROM from Drive:', e);
+        alert('Failed to download ROM from Google Drive. Try reconnecting.');
+      }
+      return;
+    }
+
+    // No file available — prompt to re-add
+    alert('ROM file not available. Please re-add it from your files or reconnect Google Drive.');
+  }
+
+  showLoadingOverlay(gameName) {
+    let overlay = document.getElementById('romLoadOverlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'romLoadOverlay';
+      overlay.className = 'n64-kb-overlay';
+      document.body.appendChild(overlay);
+    }
+    overlay.style.display = 'flex';
+    overlay.innerHTML = `
+      <div class="n64-wizard">
+        <div class="n64-wizard__title" style="font-size:11px;">Downloading</div>
+        <div class="n64-wizard__prompt" style="font-size:14px;">${gameName}</div>
+        <div class="n64-wizard__subtitle">Streaming from Google Drive...</div>
+        <div class="n64-loading__bar" style="width:200px;margin:16px auto 0;">
+          <div class="n64-loading__bar-fill"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  hideLoadingOverlay() {
+    const overlay = document.getElementById('romLoadOverlay');
+    if (overlay) overlay.style.display = 'none';
   }
 
   /**

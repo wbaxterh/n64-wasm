@@ -891,3 +891,28 @@ h1 { display: none; } /* hide old title */
   }
   .n64-game-card__title { font-size: 9px; }
 }
+
+/* =========== GOOGLE DRIVE =========== */
+
+.n64-drive-connected {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.n64-drive-status {
+  font-size: 10px;
+  color: var(--n64-green);
+  opacity: 0.7;
+}
+
+.n64-drive-unconfigured {
+  display: inline-block;
+}
+
+.n64-library__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
