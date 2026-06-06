@@ -57,7 +57,7 @@ class GoogleDriveLibrary {
       const s = document.createElement('script');
       s.id = 'gis-script';
       s.src = 'https://accounts.google.com/gsi/client';
-      s.crossOrigin = 'anonymous';
+      // Note: GIS script does NOT support CORS — don't set crossOrigin
       s.onload = () => {
         this.gisLoaded = true;
         console.log('Google Drive: GIS loaded');
@@ -67,10 +67,24 @@ class GoogleDriveLibrary {
   }
 
   /**
+   * Wait for Google APIs to load (with timeout)
+   */
+  async waitForApis(timeoutMs = 15000) {
+    const start = Date.now();
+    while (!this.gisLoaded || !this.gapiLoaded) {
+      if (Date.now() - start > timeoutMs) {
+        console.error('Google API load status:', { gis: this.gisLoaded, gapi: this.gapiLoaded, picker: this.pickerLoaded });
+        throw new Error('Google APIs failed to load. Check your network connection and browser console for blocked scripts.');
+      }
+      await new Promise(r => setTimeout(r, 200));
+    }
+  }
+
+  /**
    * Request OAuth token via Google Identity Services
    */
   async authenticate() {
-    if (!this.gisLoaded) throw new Error('GIS not loaded yet');
+    await this.waitForApis();
 
     return new Promise((resolve, reject) => {
       const tokenClient = google.accounts.oauth2.initTokenClient({
@@ -96,7 +110,7 @@ class GoogleDriveLibrary {
    */
   async pickFolder() {
     if (!this.accessToken) await this.authenticate();
-    if (!this.pickerLoaded) throw new Error('Picker API not loaded yet');
+    await this.waitForApis();
 
     return new Promise((resolve, reject) => {
       const view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
