@@ -104,6 +104,14 @@ int         g_EmulatorRunning = 0;      /* need separate boolean to tell if emul
 uint32_t rdram_pre_guardband[16 * 1024];
 ALIGN(4096, uint32_t g_rdram[RDRAM_MAX_SIZE/4]);
 uint32_t rdram_post_guardband[16 * 1024];
+
+/* Exposes the RDRAM base as a heap offset so JS can read/write N64 memory
+ * directly (browser reskin injector). g_rdram is a static global at a fixed
+ * heap address (ALLOW_MEMORY_GROWTH=0), so this is a link-time constant. */
+int neilGetRdramBase(void)
+{
+    return (int)(intptr_t)&g_rdram;
+}
 struct device g_dev;
 struct r4300_core g_r4300;
 

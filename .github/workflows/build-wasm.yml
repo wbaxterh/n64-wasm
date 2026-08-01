@@ -1,0 +1,51 @@
+name: Build WASM core
+
+# Builds the Emscripten WASM core and publishes dist/ as an artifact.
+# The Makefile uses -mrelaxed-simd / -pthread / FULL_ES3, which require a
+# modern emsdk (~3.1.50+) — the README's 2.0.7 badge is stale relative to it.
+
+on:
+  push:
+    branches: [main, 'm1-*', 'feat/*']
+    paths: ['code/**', '.github/workflows/build-wasm.yml']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.64
+          actions-cache-folder: emsdk-cache
+
+      - name: Verify emcc
+        run: emcc --version
+
+      - name: Build core
+        working-directory: code
+        run: |
+          mkdir -p ../dist
+          emmake make -j"$(nproc)"
+
+      - name: Confirm RDRAM accessor is exported
+        run: |
+          if grep -q "_neilGetRdramBase" dist/n64wasm.js; then
+            echo "OK: _neilGetRdramBase present in glue"
+          else
+            echo "WARNING: _neilGetRdramBase not found in dist/n64wasm.js"
+          fi
+          ls -la dist/
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: n64wasm-dist
+          path: |
+            dist/n64wasm.js
+            dist/n64wasm.wasm
+            dist/n64wasm.worker.js
+          if-no-files-found: error
