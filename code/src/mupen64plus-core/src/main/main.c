@@ -107,7 +107,13 @@ uint32_t rdram_post_guardband[16 * 1024];
 
 /* Exposes the RDRAM base as a heap offset so JS can read/write N64 memory
  * directly (browser reskin injector). g_rdram is a static global at a fixed
- * heap address (ALLOW_MEMORY_GROWTH=0), so this is a link-time constant. */
+ * heap address (ALLOW_MEMORY_GROWTH=0), so this is a link-time constant.
+ * EMSCRIPTEN_KEEPALIVE keeps it through -flto (it has no C callers, so LTO
+ * would otherwise strip it before EXPORTED_FUNCTIONS can grab it). */
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+EMSCRIPTEN_KEEPALIVE
+#endif
 int neilGetRdramBase(void)
 {
     return (int)(intptr_t)&g_rdram;
