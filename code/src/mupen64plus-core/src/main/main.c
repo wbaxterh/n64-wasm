@@ -104,20 +104,8 @@ int         g_EmulatorRunning = 0;      /* need separate boolean to tell if emul
 uint32_t rdram_pre_guardband[16 * 1024];
 ALIGN(4096, uint32_t g_rdram[RDRAM_MAX_SIZE/4]);
 uint32_t rdram_post_guardband[16 * 1024];
-
-/* Exposes the RDRAM base as a heap offset so JS can read/write N64 memory
- * directly (browser reskin injector). g_rdram is a static global at a fixed
- * heap address (ALLOW_MEMORY_GROWTH=0), so this is a link-time constant.
- * EMSCRIPTEN_KEEPALIVE keeps it through -flto (it has no C callers, so LTO
- * would otherwise strip it before EXPORTED_FUNCTIONS can grab it). */
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-EMSCRIPTEN_KEEPALIVE
-#endif
-int neilGetRdramBase(void)
-{
-    return (int)(intptr_t)&g_rdram;
-}
+/* neilGetRdramBase() (JS RDRAM accessor) is defined in mymain.cpp, beside
+ * runMainLoop, so -flto + EXPORTED_FUNCTIONS reliably retain the export. */
 struct device g_dev;
 struct r4300_core g_r4300;
 
