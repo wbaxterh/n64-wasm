@@ -25,10 +25,17 @@ jobs:
       - name: Verify emcc
         run: emcc --version
 
-      # Build the SDL/zlib ports serially first so the parallel make below
-      # doesn't race on the Emscripten port-cache lock (harfbuzz/sdl2_ttf).
-      - name: Warm Emscripten ports cache
-        run: embuilder build sdl2 sdl2_ttf sdl2_image zlib freetype harfbuzz
+      # Warm the ports cache with the SAME flags the real build uses (incl.
+      # -flto), via a single serial emcc. This builds the LTO variants of
+      # sdl2_ttf/harfbuzz/etc up front so the parallel make below can't race
+      # on the port-cache lock.
+      - name: Warm Emscripten ports cache (LTO variants)
+        run: |
+          echo 'int main(void){return 0;}' > warm.c
+          emcc -O3 -flto -msimd128 -mrelaxed-simd -pthread \
+            -s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_IMAGE=2 -s USE_ZLIB=1 \
+            -c warm.c -o warm.o
+          rm -f warm.c warm.o
 
       - name: Build core
         working-directory: code
