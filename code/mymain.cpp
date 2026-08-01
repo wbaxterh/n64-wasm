@@ -1409,10 +1409,19 @@ void limitFPS()
 }
 
 
+extern uint32_t g_rdram[];   /* N64 RDRAM, defined in mupen64plus-core main.c */
+
 extern "C" {
 
     void runMainLoop(){
         mainLoop();
+    }
+
+    /* Exposes the RDRAM base as a heap offset so JS can read/write N64 memory
+     * directly (browser reskin injector). Lives here beside runMainLoop (a
+     * known-good export) and is KEEPALIVE'd so -flto retains it. */
+    EMSCRIPTEN_KEEPALIVE int neilGetRdramBase(){
+        return (int)(intptr_t)&g_rdram;
     }
 
     void toggleFPS(int show){

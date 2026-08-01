@@ -104,6 +104,8 @@ int         g_EmulatorRunning = 0;      /* need separate boolean to tell if emul
 uint32_t rdram_pre_guardband[16 * 1024];
 ALIGN(4096, uint32_t g_rdram[RDRAM_MAX_SIZE/4]);
 uint32_t rdram_post_guardband[16 * 1024];
+/* neilGetRdramBase() (JS RDRAM accessor) is defined in mymain.cpp, beside
+ * runMainLoop, so -flto + EXPORTED_FUNCTIONS reliably retain the export. */
 struct device g_dev;
 struct r4300_core g_r4300;
 
