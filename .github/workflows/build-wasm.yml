@@ -25,17 +25,19 @@ jobs:
       - name: Verify emcc
         run: emcc --version
 
-      # Warm the ports cache with the SAME flags the real build uses (incl.
-      # -flto), via a single serial emcc. This builds the LTO variants of
-      # sdl2_ttf/harfbuzz/etc up front so the parallel make below can't race
-      # on the port-cache lock.
-      - name: Warm Emscripten ports cache (LTO variants)
+      # Build ports LEAF-FIRST so sdl2_ttf finds harfbuzz/freetype already
+      # cached (emscripten's sdl2_ttf recipe otherwise nest-builds harfbuzz
+      # while holding the cache lock → AssertionError). --lto matches the
+      # real build's -flto variant. Order is load-bearing: harfbuzz before
+      # sdl2_ttf.
+      - name: Warm Emscripten ports cache (leaf-first, LTO)
         run: |
-          echo 'int main(void){return 0;}' > warm.c
-          emcc -O3 -flto -msimd128 -mrelaxed-simd -pthread \
-            -s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_IMAGE=2 -s USE_ZLIB=1 \
-            -c warm.c -o warm.o
-          rm -f warm.c warm.o
+          embuilder build zlib --lto
+          embuilder build freetype --lto
+          embuilder build harfbuzz --lto
+          embuilder build sdl2 --lto
+          embuilder build sdl2_ttf --lto
+          embuilder build sdl2_image --lto
 
       - name: Build core
         working-directory: code
